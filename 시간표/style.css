@@ -1,0 +1,13 @@
+table{
+    border-collapse: collapse;
+    width: 100%;
+}
+
+th, td {
+    border: 1px solid black;
+    text-align: center; /* 가운데 정렬 스타일 적용 */
+}
+
+td{
+    background-color: lightblue;
+}

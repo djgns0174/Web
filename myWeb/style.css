@@ -1,0 +1,144 @@
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f9f9f9;
+      color: #000000;
+    }
+
+    header {
+      background-color: #007bff;
+      color: white;
+      text-align: center;
+      padding: 5px;
+    }
+
+    main {
+      max-width: 500px;
+      margin: 100px auto;
+      padding: 20px;
+      background-color: white;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      border-radius: 20px;
+      text-align: center;
+    }
+
+    article {
+      margin-bottom: 40px;
+    }
+
+    h1{
+      font-size: 40px;
+    }
+
+    h2 {
+      color: #007bff;
+      font-size: 30px;
+    }
+
+    a{
+      text-decoration: none;
+    }
+
+    a:visited{
+      color: inherit;
+    }
+
+    #record-form {
+      font-size : 20px;
+      margin-top: 20px;
+    }
+
+    label {
+      margin-bottom: 10px;
+    }
+
+    /*입력값*/
+    input {
+      width: 10%;
+      padding: 10px;
+      margin-bottom: 10px;
+      font-size:20px;
+    }
+
+    /*헬스표 입력값*/
+    .sports{
+      width:180px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .sets{
+      width:50px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .numbers{
+      width:50px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    
+    /*행추가, 삭제버튼*/
+    input[type="button"]{
+      width:15%;
+      text-align: center;
+      font-size: 15px;
+      cursor: pointer;
+      margin-bottom: 15px;
+    }
+
+    /*저장버튼*/
+    input[type="submit"] {
+      width:15%;
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+      border-radius:10px;
+      font-size:20px;
+    }
+
+    input[type="submit"]:hover {
+      background-color: #0056b3;
+    }
+
+    /*기록표*/
+    table {
+      width: 85%;
+      border-collapse: collapse;
+      text-align: center;
+      margin-top: 10px;
+      margin-left:auto;
+      margin-right:auto;
+      margin-bottom:20px;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+
+    td {
+      color:#007bff;
+    }
+
+    #myRecord td:hover {
+        cursor: pointer; /* 마우스를 올렸을 때 사용할 커서 스타일 */
+    }
+  
+
+
+    /*바닥*/
+    footer {
+      background-color: #007bff;
+      color: white;
+      text-align: center;
+      padding: 1em;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+    }

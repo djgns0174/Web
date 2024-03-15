@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <title>Your Record</title>
+</head>
+<body>
+
+  <header>
+    <h1>Running</h1>
+    <p>매일 성장하는 모습을 기록하세요</p>
+    <div id="today"></div>
+  </header>
+
+  <main>
+    <div id="record-form">
+      <label for="distance">뛴거리 : </label> 
+      <input type="number" id="distance" min="0" max="100000"> m
+      <br>
+
+      <label for="time">운동시간 : </label> 
+      <input type="number" id="time" min="0" max="10000"> min
+      <br>
+
+      <label for="injury">부상 : </label> 
+      <input type="text" id="injury" maxlength="1"> (O/X)
+      <br>
+
+      <label for="good">만족도 : </label> 
+      <input type="number" id="good" min="1" max="5"> (1~5)
+      <br>
+
+      <input type="submit" id="home" value="home">
+      <input type="submit" id="save" value="save">
+    </div>
+    <script src="runningScript.js"></script>
+  </main>
+
+  <footer>
+    &copy; 2024 Your Record
+  </footer>
+
+</body>
+</html>

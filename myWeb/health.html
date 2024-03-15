@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <title>Your Record</title>
+</head>
+<body>
+
+  <header>
+    <h1>Health</h1>
+    <p>매일 성장하는 모습을 기록하세요</p>
+    <div id="today"></div>
+  </header>
+
+  <main>
+    <div id="record-form">
+      <label for="time">운동시간 : </label> 
+      <input type="number" id="time" min="0" max="10000"> min
+      <br>
+
+      <table id="healthTable">
+        <tr id="tableHead">
+          <th>운동종목</th>
+          <th>세트수</th>
+          <th>횟수</th>
+        </tr>
+
+        <tr>
+          <td><input type="text" class="sports" maxlength="10"></td>
+          <td><input type="number" class="sets" min="0" max="10000"></td>
+          <td><input type="number" class="numbers" min="0" max="10000"></td>
+        </tr>
+      </table>
+
+      <input type='button' id='addRow' value='행추가' onclick='addRow()' />
+      <input type="button" id='deleteRow' value="행삭제" onclick="removeRow(-1)"/>
+      <br>
+
+      <label for="injury">부상 : </label> 
+      <input type="text" id="injury" maxlength="1"> (O/X)
+      <br>
+
+      <label for="good">만족도 : </label> 
+      <input type="number" id="good" min="1" max="5"> (1~5)
+      <br>
+
+      <input type="submit" id="home" value="home">
+      <input type="submit" id="save" value="save">
+    </div>
+    <script src="healthScript.js"></script>
+  </main>
+
+  <footer>
+    &copy; 2024 Your Record
+  </footer>
+
+</body>
+</html>
