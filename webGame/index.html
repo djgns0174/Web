@@ -1,1 +1,158 @@
-webGame 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dodge The Poop</title>
+<style>
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background-color: #f0f0f0;
+        font-family: Arial, sans-serif;
+    }
+    #gameContainer {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+        border: 2px solid #333;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        position: relative; /* 게임 컨테이너의 위치 설정 */
+        z-index: 0;
+    }
+    #gameCanvas {
+        margin-bottom: 20px;
+        border: 2px solid black;
+        z-index: 1;
+    }
+    #scoreDisplay {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+    #btnStart {
+        padding: 10px 20px;
+        font-size: 18px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    #btnStart:hover {
+        background-color: #45a049;
+    }
+    #arrayGrid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 2px;
+        width: 30px; /* 그리드 너비 */
+        height: 30px; /* 그리드 높이 */
+        position: absolute; /* 배열 그리드 위치 설정 */
+        top: 30%; /* 위에서 절반만큼 이동 */
+        left: 36.5%; /* 왼쪽에서 절반만큼 이동 */
+        transform: translate(-50%, -50%); /* 정확한 가운데 정렬 */
+        z-index: 2;
+    }
+    .gridCell {
+        width: 50px;
+        height: 50px;
+        background-color: #eee;
+        border: 1px solid #333;
+    }
+    .gridCell.blue {
+        background-color: blue;
+    }
+</style>
+</head>
+<body>
+    <div id="gameContainer">
+        <div id="arrayGrid">
+            <div class="gridCell"></div>
+            <div class="gridCell"></div>
+            <div class="gridCell"></div>
+            <div class="gridCell"></div>
+            <div class="gridCell"></div>
+            <div class="gridCell"></div>
+            <div class="gridCell"></div>
+            <div class="gridCell"></div>
+            <div class="gridCell"></div>
+        </div>
+        <canvas id="gameCanvas" width="400" height="400"></canvas>
+        <div id="scoreDisplay">Score: 0</div>
+        <button id="btnStart">Start Game</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let score = 0;
+        let gameRunning = false;
+
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function update() {
+            clearCanvas();
+            displayScore();
+            if (gameRunning) {
+                requestAnimationFrame(update);
+            }
+        }
+
+        function displayScore() {
+            document.getElementById('scoreDisplay').innerText = 'Score: ' + score;
+        }
+
+        document.getElementById('btnStart').addEventListener('click', () => {
+            if (!gameRunning) {
+                gameRunning = true;
+                score = 0;
+                document.querySelectorAll('.gridCell').forEach(cell => {
+                    cell.classList.remove('blue');
+                });
+                const randomCellIndex = Math.floor(Math.random() * 9);
+                document.querySelectorAll('.gridCell')[randomCellIndex].classList.add('blue');
+                update();
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (gameRunning) {
+            const blueCell = document.querySelector('.gridCell.blue');
+            let newBlueCell;
+
+            switch (e.key) {
+                case 'ArrowLeft':
+                    newBlueCell = blueCell.previousElementSibling;
+                    break;
+                case 'ArrowRight':
+                    newBlueCell = blueCell.nextElementSibling;
+                    break;
+                case 'ArrowUp':
+                    newBlueCell = blueCell.parentElement.previousElementSibling.children[blueCell.cellIndex];
+                    break;
+                case 'ArrowDown':
+                    newBlueCell = blueCell.parentElement.nextElementSibling.children[blueCell.cellIndex];
+                    break;
+            }
+
+            if (newBlueCell && newBlueCell.classList.contains('gridCell')) {
+                blueCell.classList.remove('blue');
+                newBlueCell.classList.add('blue');
+            }
+        }
+    });
+
+    </script>
+</body>
+</html>
