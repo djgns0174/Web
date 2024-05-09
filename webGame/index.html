@@ -4,73 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dodge The Poop</title>
-<style>
-    body {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        margin: 0;
-        background-color: #f0f0f0;
-        font-family: Arial, sans-serif;
-    }
-    #gameContainer {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 20px;
-        border: 2px solid #333;
-        background-color: #fff;
-        border-radius: 10px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-        position: relative; /* 게임 컨테이너의 위치 설정 */
-        z-index: 0;
-    }
-    #gameCanvas {
-        margin-bottom: 20px;
-        border: 2px solid black;
-        z-index: 1;
-    }
-    #scoreDisplay {
-        font-size: 24px;
-        font-weight: bold;
-        margin-bottom: 10px;
-    }
-    #btnStart {
-        padding: 10px 20px;
-        font-size: 18px;
-        background-color: #4CAF50;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: background-color 0.3s;
-    }
-    #btnStart:hover {
-        background-color: #45a049;
-    }
-    #arrayGrid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 2px;
-        width: 30px; /* 그리드 너비 */
-        height: 30px; /* 그리드 높이 */
-        position: absolute; /* 배열 그리드 위치 설정 */
-        top: 30%; /* 위에서 절반만큼 이동 */
-        left: 36.5%; /* 왼쪽에서 절반만큼 이동 */
-        transform: translate(-50%, -50%); /* 정확한 가운데 정렬 */
-        z-index: 2;
-    }
-    .gridCell {
-        width: 50px;
-        height: 50px;
-        background-color: #eee;
-        border: 1px solid #333;
-    }
-    .gridCell.blue {
-        background-color: blue;
-    }
-</style>
+<link rel="styleSheet" href="style.css">
 </head>
 <body>
     <div id="gameContainer">
@@ -88,71 +22,234 @@
         <canvas id="gameCanvas" width="400" height="400"></canvas>
         <div id="scoreDisplay">Score: 0</div>
         <button id="btnStart">Start Game</button>
+        <button id="btnPause">Pause/Resume</button>
     </div>
 
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
-
+        
+        const cellSize = 40;
+        let obstacleX = 0;
+        let obstacleY = 0;
+        let obstacleSpeed = 2; // 초기 속도
+        let speedIncrement = 0.05; // 시간이 지날 때마다 증가할 속도
         let score = 0;
         let gameRunning = false;
-
-        function clearCanvas() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        let paused = false; // 게임 일시 정지 여부
+        let playerIndex = 4;
+        let animationId; // 애니메이션 프레임 ID
+        let randomIndex = 0;
+        let obstacleDirectionArray = ["up", "left", "right", "left"];
+        let obstacleDirection;
+        
+        const obstacleLocationX = [cellSize*3+10, cellSize*5-15, cellSize*6-3]
+        const obstacleLocationY = [cellSize*3+22, cellSize*5-5, cellSize*6+10];
+        // right down location 설정필요
+        
+        function drawObstacleTop() {
+            obstacleX = obstacleLocationX[randomIndex];
+            ctx.fillStyle = 'red';
+            ctx.fillRect(obstacleX, obstacleY, cellSize, cellSize);
         }
 
-        function update() {
-            clearCanvas();
-            displayScore();
-            if (gameRunning) {
-                requestAnimationFrame(update);
+        function drawObstacleLeft(){
+            obstacleY = obstacleLocationY[randomIndex];
+            ctx.fillStyle = 'red';
+            ctx.fillRect(obstacleX, obstacleY, cellSize, cellSize);
+        }
+
+        function drawObstacleRight(){
+            obstacleY = obstacleLocationY[randomIndex];
+            ctx.fillStyle = 'red';
+            ctx.fillRect(obstacleX, obstacleY, cellSize, cellSize);
+        }
+
+        function drawObstacleBottom(){
+            obstacleX = obstacleLocationX[randomIndex];
+            ctx.fillStyle = 'red';
+            ctx.fillRect(obstacleX, obstacleY, cellSize, cellSize);
+        }
+
+        function removeObstacle() {
+            ctx.clearRect(cellSize * 3, obstacleY, cellSize, cellSize);
+        }
+
+        function obstacleLocationReset(){
+            switch(obstacleDirection){
+                case "up":
+                case "left":
+                    obstacleX = -cellSize;
+                    obstacleY = -cellSize;
+                    break;
+                    case "right":
+                    case "bottom":
+                        obstacleX = canvas.width;
+                        obstacleY = canvas.height;
+                        break;
             }
         }
 
+        function isObstaclePass(){
+            if(obstacleY > canvas.height+50 || obstacleX > canvas.width+50 || obstacleX < 0-50 || obstacleY < 0-50) return true;
+            else return false;
+        }
+
+        function obstaclePass(){
+            score++;
+            obstacleLocationReset();
+            removeObstacle();
+            obstacleDirection = obstacleDirectionArray[Math.floor(Math.random() * obstacleDirectionArray.length)];    // 장애물 방향 초기화
+
+            randomIndex = Math.floor(Math.random() * 3);
+            switch(obstacleDirection){
+                case "up":
+                case "bottom":
+                    obstacleX = obstacleLocationX[randomIndex];
+                    break;
+                case "left":
+                case "right":
+                    obstacleY = obstacleLocationY[randomIndex];
+                    break;
+            }
+            obstacleSpeed += speedIncrement; // 속도 증가
+        }
+        
+        function checkCollision() {
+            // 플레이어의 x, y 좌표 계산
+            const playerX = (playerIndex % 3) * cellSize;
+            const playerY = Math.floor(playerIndex / 3) * cellSize + canvas.height - cellSize * 3; // 하단에서 시작하므로 높이 조정 필요
+            console.log("obstacleX "+ obstacleX);   //test
+            console.log("obstacleY "+ obstacleY);   //test
+            
+        
+            // 장애물의 x, y 좌표와 플레이어의 x, y 좌표가 겹치는지 확인
+            if( Math.abs(playerX - (obstacleX-130)) < 20  && Math.abs(playerY - (obstacleY+120)) < 20){
+                return true;
+            }
+            else{
+                return false;
+            }
+        }
+        
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+        
         function displayScore() {
             document.getElementById('scoreDisplay').innerText = 'Score: ' + score;
         }
-
+        
         document.getElementById('btnStart').addEventListener('click', () => {
             if (!gameRunning) {
                 gameRunning = true;
                 score = 0;
+                playerIndex = 4; // 플레이어 위치 초기화
+                obstacleSpeed = 2;
+
+                randomIndex = Math.floor(Math.random() * obstacleLocationY.length);
+                obstacleDirection = obstacleDirectionArray[Math.floor(Math.random() * obstacleDirectionArray.length)];    // 장애물 방향 초기화
+                obstacleLocationReset();
+
                 document.querySelectorAll('.gridCell').forEach(cell => {
                     cell.classList.remove('blue');
                 });
-                const randomCellIndex = Math.floor(Math.random() * 9);
-                document.querySelectorAll('.gridCell')[randomCellIndex].classList.add('blue');
+                document.querySelectorAll('.gridCell')[playerIndex].classList.add('blue');
                 update();
             }
         });
-
-        document.addEventListener('keydown', (e) => {
-            if (gameRunning) {
-            const blueCell = document.querySelector('.gridCell.blue');
-            let newBlueCell;
-
-            switch (e.key) {
-                case 'ArrowLeft':
-                    newBlueCell = blueCell.previousElementSibling;
-                    break;
-                case 'ArrowRight':
-                    newBlueCell = blueCell.nextElementSibling;
-                    break;
-                case 'ArrowUp':
-                    newBlueCell = blueCell.parentElement.previousElementSibling.children[blueCell.cellIndex];
-                    break;
-                case 'ArrowDown':
-                    newBlueCell = blueCell.parentElement.nextElementSibling.children[blueCell.cellIndex];
-                    break;
-            }
-
-            if (newBlueCell && newBlueCell.classList.contains('gridCell')) {
-                blueCell.classList.remove('blue');
-                newBlueCell.classList.add('blue');
+        
+        function gameOver() {
+            gameRunning = false;
+            alert(`Game Over! Your score is ${score}.`);
+        }
+        
+        function togglePause() {
+            if (!gameRunning) return; // 게임이 실행 중이 아닌 경우 무시
+            paused = !paused; // 일시 중지 토글
+            if (paused) {
+                cancelAnimationFrame(animationId); // 애니메이션 프레임 중지
+            } else {
+                update(); // 게임 재개
             }
         }
-    });
+        
+        document.getElementById('btnPause').addEventListener('click', () => {
+            togglePause(); // 일시 중지 버튼 클릭 시 일시 중지/재개 토글
+        });
+        
+        function update() {
+            clearCanvas();
+            if (gameRunning && !paused) {
+                if (checkCollision()) {
+                    gameOver();
+                    return;
+                }
+            
+                switch(obstacleDirection){
+                    case "up":
+                        drawObstacleTop();
+                        obstacleY += obstacleSpeed;
+                        break;
 
-    </script>
+                    case "left":
+                        drawObstacleLeft();
+                        obstacleX += obstacleSpeed;
+                        break;
+                    case "right":
+                        drawObstacleRight();
+                        obstacleX -= obstacleSpeed;
+                        break;
+                    case "down":
+                        drawObstacleBottom();
+                        obstacleY -= obstacleSpeed;
+                        break;
+                }
+
+                if (isObstaclePass()) {
+                    obstaclePass();
+                }
+
+                animationId = requestAnimationFrame(update); // 애니메이션 프레임 요청
+            }
+            displayScore();
+        }
+        
+        document.addEventListener('keydown', (e) => {
+            if (gameRunning && !paused) {
+                const gridCells = document.querySelectorAll('.gridCell');
+                const blueCell = document.querySelector('.gridCell.blue');
+                const currentIndex = Array.from(gridCells).indexOf(blueCell);
+        
+                switch (e.key) {
+                    case 'ArrowLeft':
+                        playerIndex = currentIndex - 1;
+                        break;
+        
+                    case 'ArrowRight':
+                        playerIndex = currentIndex + 1;
+                        break;
+        
+                    case 'ArrowUp':
+                        playerIndex = currentIndex - 3; // 3x3 격자에서 위로 한 칸 이동
+                        break;
+        
+                    case 'ArrowDown':
+                        playerIndex = currentIndex + 3; // 3x3 격자에서 아래로 한 칸 이동
+                        break;
+                }
+        
+                if (playerIndex >= 0 && playerIndex < gridCells.length && gridCells[playerIndex].classList.contains('gridCell')) {
+                    blueCell.classList.remove('blue');
+                    gridCells[playerIndex].classList.add('blue');
+                }
+            }
+        });
+        
+        function getAbsoluteValue(number) { //절대값 구하기
+            return Math.abs(number);
+        }
+
+        </script>
 </body>
 </html>
